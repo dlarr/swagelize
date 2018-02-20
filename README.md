@@ -1,3 +1,5 @@
+ORIGINALY FORKED FROM : https://github.com/kingsquare/swagger-sequelize
+====
 Generate Sequelize model definitions from a Swagger 2.0 schema
 ====
 
