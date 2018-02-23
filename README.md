@@ -1,6 +1,17 @@
 ORIGINALY FORKED FROM : https://github.com/kingsquare/swagger-sequelize
 ====
 Generate Sequelize model definitions from a Swagger 2.0 schema
+Tasks the lib does:
+- Generate sequelize structure folders and files with definitions and associations
+    - Generate a folder models with index.js containing Sequelize configuration and initialisation
+    - Generate all models from swagger definitions node
+    - Generate associations within sequelize model files
+        - As of today, only One to Many associations are covered due to lack of swagger spec support of data models feature (no primary key definitions, no cardinality definitions)
+        - (YET TO COME) One to one associations, many to many associations
+- (YET TO COME) Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code
+
+Restrictions : this libray has been developed for MariaDB project needs, so I only tested it for MariaDB sequelization in a nodejs project
+
 ====
 
 Prequisites: 
@@ -13,19 +24,30 @@ Currently, the project simply maps Swagger-datatypes to their Sequelize counterp
 Sample usage:
 
 ```js
-var swaggerSequelize = require('swagger-sequelize');
+var swagelize = require('swagelize');
 var fs = require('fs');
 var Sequelize = require('sequelize');
 
 var sequelize = new Sequelize('<your uri>');
 var swaggerSpec = JSON.parse(fs.readFileSync('<your swagger.sjon>', 'utf-8'));
 
-var MyModel =  sequelize.define('MyModel', swaggerSequelize.generate(swaggerSpec.definitions.MyModel));
+swagelize.generateAll('<your swagger.sjon>');
 
-// ... do stuff with MyModel e.g. to setup your tables:
+```
 
-MyModel.sync({force: true})
-
+**This project is assuming you have configured sequelize through a config.js contained in a config folder as specified on sequelize docs**
+example of config.js
+```js
+module.exports = {
+    "local": {
+        "username": "root",
+        "password": "admin",
+        "database": "TEST_SWAGUELIZE",
+        "host": "127.0.0.1",
+        "dialect": "mysql",
+        "port": "3306"
+    }
+};
 ```
 
 In case you want to read from a `swagger.yaml` rather than from a `swagger.json`, you could replace the JSON-import
