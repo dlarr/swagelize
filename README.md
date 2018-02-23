@@ -1,6 +1,6 @@
 ORIGINALY FORKED FROM : https://github.com/kingsquare/swagger-sequelize
 ====
-Generate Sequelize model definitions from a Swagger 2.0 schema
+Generate Sequelize model definitions from a Swagger 2.0 schema <br/><br/>
 Tasks the lib does:
 - Generate sequelize structure folders and files with definitions and associations
     - Generate a folder models with index.js containing Sequelize configuration and initialisation
