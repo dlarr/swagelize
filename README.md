@@ -29,9 +29,9 @@ var fs = require('fs');
 var Sequelize = require('sequelize');
 
 var sequelize = new Sequelize('<your uri>');
-var swaggerSpec = JSON.parse(fs.readFileSync('<your swagger.sjon>', 'utf-8'));
+var swaggerSpec = JSON.parse(fs.readFileSync('<your swagger.json>', 'utf-8'));
 
-swagelize.generateAll('<your swagger.sjon>');
+swagelize.generateAll(swaggerSpec);
 
 ```
 
