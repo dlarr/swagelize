@@ -54,12 +54,17 @@
 	"definitions": {
 		"Token": {
 			"properties": {
+				"id": {
+					"type": "integer",
+					"x-primary-key": true
+				},
 				"token": {
 					"type": "string"
 				},
 				"expires": {
 					"type": "string",
-					"format": "date-time"
+					"format": "date-time",
+					"nullable": true
 				}
 			}
 		},
@@ -89,7 +94,8 @@
 		"User": {
 			"properties": {
 				"userId": {
-					"type": "string"
+					"type": "string",
+					"x-primary-key": true
 				},
 				"groupId": {
 					"type": "string",
@@ -322,7 +328,6 @@
 							"Facturen",
 							"Handleidingen",
 							"Havenbedrijf",
-							"Instellingen",
 							"LeeskostenVoorVerzender",
 							"Mappen",
 							"Nieuwsbrief",
@@ -624,7 +629,8 @@
 		"Agent": {
 			"properties": {
 				"userId": {
-					"type": "string"
+					"type": "string",
+					"x-primary-key": true
 				},
 				"agentId": {
 					"type": "string"

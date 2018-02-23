@@ -1,5 +1,5 @@
 {
-  "name": "swagger-sequelize",
+  "name": "swagelize",
   "version": "0.2.0",
   "description": "Generate Sequelize model definitions from a Swagger 2.0 schema",
   "main": "index.js",
@@ -9,6 +9,11 @@
   "author": "Kingsquare BV - Tim de Koning",
   "repository": "https://github.com/kingsquare/swagger-sequelize",
   "license": "MIT",
+  "dependencies": {
+    "mysql2": "^1.5.2",
+    "nodeunit-async": "^1.2.1",
+    "sequelize": "*"
+  },
   "devDependencies": {
     "bluebird": "^3.5.1",
     "nodeunit": "^0.11.1"
