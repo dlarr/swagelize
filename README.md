@@ -1,5 +1,8 @@
 ORIGINALY FORKED FROM : https://github.com/kingsquare/swagger-sequelize
 ====
+this project is an open source project developed by Yoop Digital company: http://yoop.digital
+
+
 Generate Sequelize model definitions from a Swagger 2.0 schema <br/><br/>
 Tasks the lib does:
 - Generate sequelize structure folders and files with definitions and associations
