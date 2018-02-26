@@ -82,7 +82,7 @@ here is a [Pet]N-----1..0[Category] association (nullable: false would make it [
     },
 ```
 <br/>
-Here is a [Pet]N-----N[Category] association <br/>
+Here is a [Pet]N-----N[Category] association
 ```
 "Pet": {
       "type": "object",
@@ -104,7 +104,7 @@ Here is a [Pet]N-----N[Category] association <br/>
 <br/>
 That will generate a table PetCategory with 2 fields id_pet, id_category as composed primary key, each being FK to respective tables. <br/>.
 Note that, if the association table must have other fields, you don't have to specify the FKs. <br/>
-Moreover, you need to specify that this is a throughTable, so that references won't be handle for this table.<br/>:
+Moreover, you need to specify that this is a throughTable, so that references won't be handle for this table.
 ```
 "PetTag": {
       "type": "object",
