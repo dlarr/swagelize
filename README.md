@@ -185,3 +185,14 @@ To be consistent, one should "officially" add js-yaml to the project:
 npm install --save js-yaml
 ```
 
+
+## Full generation of project
+You can combined this project with swagger-codegen project (https://github.com/swagger-api/swagger-codegen), in order to have Full layer service generated from the swagger spec. <br/>
+Use this jar as follow: <br/>
+- Add a script to package.Json :
+```
+"generate-api": "cd <CONTAINING FOLDER .jar and swagger spec> && java -jar swagger-codegen-cli.jar generate -i swagger.json -l nodejs-server -o ../",
+```
+
+- Then run your script : npm run generate-api
+- Result would be a full nodejs project, with API service layer generated
