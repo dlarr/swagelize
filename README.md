@@ -38,6 +38,7 @@ Here after, what you need to do in order to specify cardinality: <br/>
 ```
 - For Object arrays, you can specify a "throughTable" attribute, and that would means it's a N-N associations: <br/>
 Example : <br/>
+
 ```
 "Pet": {
       "type": "object",
@@ -64,6 +65,7 @@ Example : <br/>
 
 - Same thing goes for $ref objects : <br/>
 here is a [Pet]N-----1..0[Category] association (nullable: false would make it [Pet]N-----1[Category]) <br/>
+
 ```
 "Pet": {
       "type": "object",
@@ -81,8 +83,10 @@ here is a [Pet]N-----1..0[Category] association (nullable: false would make it [
       "x-primary-key": ["id"],
     },
 ```
+
 <br/>
 Here is a [Pet]N-----N[Category] association
+
 ```
 "Pet": {
       "type": "object",
@@ -101,10 +105,12 @@ Here is a [Pet]N-----N[Category] association
       "x-primary-key": ["id"],
     },
 ```
+
 <br/>
 That will generate a table PetCategory with 2 fields id_pet, id_category as composed primary key, each being FK to respective tables. <br/>.
 Note that, if the association table must have other fields, you don't have to specify the FKs. <br/>
 Moreover, you need to specify that this is a throughTable, so that references won't be handle for this table.
+
 ```
 "PetTag": {
       "type": "object",
