@@ -977,6 +977,7 @@
         },
         "category": {
           "$ref": "#/definitions/Category",
+          "sourceCardinality": "1",
           "nullable": true
         },
         "name": {

@@ -11,7 +11,7 @@ Tasks the lib does:
     - Generate associations within sequelize model files
         - As of today, only One to Many associations are covered due to lack of swagger spec support of data models feature (no primary key definitions, no cardinality definitions),
         - many to many associations
-        - (YET TO COME) One to one associations,
+        - One to one associations,
 - (YET TO COME) Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code
 
 Restrictions : this libray has been developed for MariaDB project needs, so I only tested it for MariaDB sequelization in a nodejs project
@@ -76,6 +76,7 @@ here is a [Pet]N-----1..0[Category] association ( nullable: false would make it 
         },
         "category": {
           "$ref": "#/definitions/Category",
+          "sourceCardinality": "N",
           "nullable": true
         },
         ...
@@ -83,6 +84,10 @@ here is a [Pet]N-----1..0[Category] association ( nullable: false would make it 
       "x-primary-key": ["id"],
     },
 ```
+Note the "sourceCardinality" : "N" attribute, allowing to specify the N part ine the relationship.<br/>
+if you decide to put "sourceCardinality" : "1", then you're describing a [Pet]1-----1[Category]. <br/>
+** !!!! Only 1 and N are supported here !!!! **
+
 
 Here is a [Pet]N-----N[Category] association:
 

@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
 	});
 
 	 Category.associate =  function (models) {
-		models.Category.hasMany(models.Pet, {foreignKey: 'id_category'});
+		models.Category.hasOne(models.Pet, {foreignKey: 'id_category'});
 	};
 
 	return Category;

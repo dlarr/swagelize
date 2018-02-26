@@ -510,11 +510,10 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
             delete propertySchema.nullable;
         }
 
-        // If current propertyName is contained withing PKS, promote it to primaryKey (supporting multiple PKS
+        // If current propertyName is contained withing PKS, promote it to primaryKey (supporting multiple PKS)
         const pkeys = allModelsSchema[currentModel]['x-primary-key'];
         if (pkeys){
             for (let i = 0; i < pkeys.length; i++){
-                console.log('PK field = ', pkeys[i]);
                 if (propertyName ===  pkeys[i]) {
                     propertySchema.primaryKey = true;
                     propertySchema.allowNull = false;
@@ -524,16 +523,6 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
                 }
             }
         }
-
-        // if(propertySchema['x-primary-key'] === true) {
-        //     propertySchema.primaryKey = true;
-        //     if (propertySchema['type'] !== 'string'){
-        //         propertySchema.autoIncrement = true;
-        //     }
-        //     propertySchema.allowNull = false;
-        //     delete propertySchema['x-primary-key'];
-        // }
-        // END: Promote Attribute to primaryKey with autoIncrement
 
 		const seqType = getSequalizeTypeString(propertySchema);
         // console.log('================> seqType = ', seqType);
@@ -551,10 +540,12 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
             const type = temp[temp.length -1];
             const throughTable = propertySchema.throughTable;
             const nullable = propertySchema.nullable;
+            const sourceCardinality = propertySchema.sourceCardinality;
             foreignKeys.push({
                 propertyToRemove: propertyName,
                 propertyType: type,
                 throughTable: throughTable,
+                sourceCardinality: sourceCardinality,
                 nullable: nullable
             });
             console.dir(foreignKeys);
@@ -583,6 +574,7 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
                     referencedModel: typeToFind,
                     fksUsed: pkForTypeToFind.pks,
                     throughTable: foreignKeys[i].throughTable,
+                    sourceCardinality: foreignKeys[i].sourceCardinality,
                     nullable: foreignKeys[i].nullable
                 });
             }
@@ -737,9 +729,15 @@ function generateModels(modelSchema) {
                             console.log('throughTable = ', associationValue[i].throughTable);
                             const referencedModel = associationValue[i].referencedModel;
                             const throughTable = associationValue[i].throughTable;
+                            const sourceCardinality = associationValue[i].sourceCardinality;
+
+                            // If cardinality is definined, it can only be 1 or N
+                            if (sourceCardinality && (sourceCardinality !== '1' && sourceCardinality !== 'N')){
+                                throw new Error('Cardinality can only be 1 or N, encountered ' + sourceCardinality + ' for model ' + associationKey);
+                            }
 
                             // PART 1 => ASSOCIATE IN MODEL REFERENCING
-                            if (throughTable){
+                            if (throughTable){ // N-N associations
                                 modelContents[currentKey].modelContent += '\n';
                                 modelContents[currentKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                 modelContents[currentKey].modelContent += '\t\tmodels.' + associationKey +
@@ -761,7 +759,7 @@ function generateModels(modelSchema) {
 
 
                             // PART 2 => ASSOCIATE IN MODEL REFERENCED
-                            if (throughTable){
+                            if (throughTable){ // N-N association
                                 modelContents[referencedModel].modelContent += '\n';
                                 modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                 modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel +
@@ -771,10 +769,17 @@ function generateModels(modelSchema) {
                                     '\', otherKey: \'id_' + uncapitalize(associationKey) + '\'});\n';
                                 modelContents[referencedModel].modelContent += '\t};\n';
                             } else {
-                                modelContents[referencedModel].modelContent += '\n';
-                                modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
-                                modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
-                                modelContents[referencedModel].modelContent += '\t};\n';
+                                if (sourceCardinality === 'N'){ // N to 1 association
+                                    modelContents[referencedModel].modelContent += '\n';
+                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
+                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                } else { // One to one association
+                                    modelContents[referencedModel].modelContent += '\n';
+                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
+                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                }
                             }
                         }
                     }
