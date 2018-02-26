@@ -110,7 +110,7 @@ Note that, if the association table must have other fields, you don't have to sp
 Moreover, you need to specify that this is a throughTable, so that references won't be handle for this table.
 
 ```
-"PetTag": {
+"PetCategory": {
       "type": "object",
       "throughTable": true,
       "properties": {
@@ -118,7 +118,7 @@ Moreover, you need to specify that this is a throughTable, so that references wo
           "$ref": "#/definitions/Pet"
         },
         "tag": {
-          "$ref": "#/definitions/Tag"
+          "$ref": "#/definitions/Category"
         },
         "dateX": {
           "type": "string",
