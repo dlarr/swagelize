@@ -12,7 +12,7 @@ Tasks the lib does:
         - As of today, only One to Many associations are covered due to lack of swagger spec support of data models feature (no primary key definitions, no cardinality definitions),
         - many to many associations
         - (YET TO COME) One to one associations,
-        - (YET TO COME) Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code
+- (YET TO COME) Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code
 
 Restrictions : this libray has been developed for MariaDB project needs, so I only tested it for MariaDB sequelization in a nodejs project
 
