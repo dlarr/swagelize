@@ -383,23 +383,23 @@ function generate (schema) {
 
 }
 
-function findPrimaryKey(theModelSchema){
-    const parsed = JSON.parse(JSON.stringify(theModelSchema.properties));
-    console.dir(parsed, false, 5, true);
-    let fkPropertySchema = '';
-    let fkName = '';
-    Object.keys(parsed).forEach((propertyName) => {
-        var propertySchema = parsed[propertyName];
-        if(propertySchema['x-primary-key'] === true) {
-            fkPropertySchema = propertyName;
-            fkName = propertyName;
-        }
-    });
-    if (fkPropertySchema !== ''){
-        return {fkPropertySchema: parsed[fkPropertySchema], fkName: fkName};
-    }else {
-        throw new Error('No primary key referenced !!!');
+function findPrimaryKey(theModel, theModelSchema){
+    const parsed = JSON.parse(JSON.stringify(theModelSchema));
+    // console.dir(parsed, false, 5, true);
+    // let fkPropertySchema = '';
+    // let fkName = '';
+    // Object.keys(parsed).forEach((propertyName) => {
+    //     var propertySchema = parsed[propertyName];
+    //     if(propertySchema['x-primary-key'] === true) {
+    //         fkPropertySchema = propertyName;
+    //         fkName = propertyName;
+    //     }
+    // });
+    if (!parsed['x-primary-key']){
+        throw new Error('No primary key referenced for model ' + theModel + ' !!!');
     }
+
+    return {pks: parsed['x-primary-key']};
 }
 
 /**
@@ -495,11 +495,11 @@ function generateModelIndex() {
  * @param schema
  */
 function generateOne (currentModel, currentModelSchema, allModelsSchema, associations) {
-    // var result = JSON.parse(JSON.stringify(currentModelSchema.properties));
     var result = currentModelSchema;
     // console.log('result => ', result);
     const foreignKeys = [];
-    Object.keys(result).forEach((propertyName) => {
+    const throughTable = allModelsSchema[currentModel].throughTable;
+    Object.keys(result).forEach((propertyName) => { // for each property in model shcema
         var propertySchema = result[propertyName];
 
         if (propertySchema.nullable){
@@ -510,15 +510,29 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
             delete propertySchema.nullable;
         }
 
-        // BEGIN: Promote Attribute to primaryKey with autoIncrement
-        if(propertySchema['x-primary-key'] === true) {
-            propertySchema.primaryKey = true;
-            if (propertySchema['type'] !== 'string'){
-                propertySchema.autoIncrement = true;
+        // If current propertyName is contained withing PKS, promote it to primaryKey (supporting multiple PKS
+        const pkeys = allModelsSchema[currentModel]['x-primary-key'];
+        if (pkeys){
+            for (let i = 0; i < pkeys.length; i++){
+                console.log('PK field = ', pkeys[i]);
+                if (propertyName ===  pkeys[i]) {
+                    propertySchema.primaryKey = true;
+                    propertySchema.allowNull = false;
+                    if (propertySchema['type'] !== 'string'){
+                        propertySchema.autoIncrement = true;
+                    }
+                }
             }
-            propertySchema.allowNull = false;
-            delete propertySchema['x-primary-key'];
         }
+
+        // if(propertySchema['x-primary-key'] === true) {
+        //     propertySchema.primaryKey = true;
+        //     if (propertySchema['type'] !== 'string'){
+        //         propertySchema.autoIncrement = true;
+        //     }
+        //     propertySchema.allowNull = false;
+        //     delete propertySchema['x-primary-key'];
+        // }
         // END: Promote Attribute to primaryKey with autoIncrement
 
 		const seqType = getSequalizeTypeString(propertySchema);
@@ -535,7 +549,14 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
         if (propertySchema.$ref){
             const temp = propertySchema.$ref.split('/');
             const type = temp[temp.length -1];
-            foreignKeys.push({propertyToRemove: propertyName, propertyType: type});
+            const throughTable = propertySchema.throughTable;
+            const nullable = propertySchema.nullable;
+            foreignKeys.push({
+                propertyToRemove: propertyName,
+                propertyType: type,
+                throughTable: throughTable,
+                nullable: nullable
+            });
             console.dir(foreignKeys);
         }
         if (propertySchema.default) {
@@ -546,34 +567,28 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
     });
 
     // MANAGING FOREIGN KEYS FOR CURRENT MODEL
+
     if (foreignKeys.length > 0){
         for(let i = 0; i < foreignKeys.length; i++){
 
             const refRemove = foreignKeys[i].propertyToRemove;
             const typeToFind = foreignKeys[i].propertyType;
             delete result[refRemove];
-            // const fk = 'id_' + refRemove;
-            const pkForTypeToFind = findPrimaryKey(allModelsSchema[typeToFind]);
+            if (!throughTable){
+                const pkForTypeToFind = findPrimaryKey(typeToFind, allModelsSchema[typeToFind]);
 
-            // OUT OF DATE FOR SEQUELIZE, WE DON'T NEED THE FK DESCRIBED IN THE MODEL
-            // result[fk] = {
-            //     type: getSequalizeTypeString(pkForTypeToFind.fkPropertySchema),
-            //     allowNull: false,
-            //     references: {
-            //         model:typeToFind,
-            //         key:pkForTypeToFind.fkName
-            //     }
-            // }
-
-            //flag this associaition for l8er
-            associations[currentModel] = associations[currentModel] || [];
-            associations[currentModel].push({
-                referencedModel: typeToFind,
-                fkUsed: pkForTypeToFind.fkName,
-                nullable: true
-            });
+                //flag this association to process l8er
+                associations[currentModel] = associations[currentModel] || [];
+                associations[currentModel].push({
+                    referencedModel: typeToFind,
+                    fksUsed: pkForTypeToFind.pks,
+                    throughTable: foreignKeys[i].throughTable,
+                    nullable: foreignKeys[i].nullable
+                });
+            }
         }
     }
+
 
     return result;
 
@@ -592,23 +607,22 @@ function generateModels(modelSchema) {
 
         // MANAGING ARRAY TYPES
         console.log('============= MANAGING ARRAYS IN DEFINITIONS =============');
-        let modelSchemas = []; // {key : key, modelSchema : result}
+        let modelSchemas = [];
         let arrays = []
         let associations = {};
         /** index = loop index / key = modelName / value = schema content of the modelName */
-        for (const [index, [key, value]] of Object.entries(Object.entries(modelSchema))) {
+        for (const [index, [key, value]] of Object.entries(Object.entries(modelSchema))) { // for each entry in swagger spec definitions node
 
             var result = JSON.parse(JSON.stringify(value.properties));
             // console.log('PROCESSING ' + key + ' - result : ', result);
 
-            Object.keys(result).forEach((propertyName) => {
+            Object.keys(result).forEach((propertyName) => { // for each entry in the Object
                 var propertySchema = result[propertyName];
 
                 if (propertySchema.type === 'array'){
 
-
-
                     let impactedType ='';
+                    let throughTable ='';
                     // Add property FK to this current model into the referenced item type
                     if (!propertySchema.items){
                         throw new Error('swagger definitions contains an array without items definitions : ' + key);
@@ -617,7 +631,8 @@ function generateModels(modelSchema) {
 
                         const temp = propertySchema.items.$ref.split('/');
                         impactedType = temp[temp.length-1];
-                        // console.log('Referenced ARRAY => ', impactedType + ' for ' + key);
+                        throughTable = propertySchema.throughTable;
+                        console.log('Referenced ARRAY => ', impactedType + ' for ' + key + ' throughTable = ' + throughTable);
 
                     } else if (propertySchema.items.type === 'string') {
                         console.log('Encountered an ARRAY of string, not processing')
@@ -627,7 +642,12 @@ function generateModels(modelSchema) {
                     }
 
                     // Mark the property to be removed from model, and Model to be impacted
-                    arrays.push({propertyToRemove: propertyName, impactedType: impactedType, toBeReferenced: key});
+                    arrays.push({
+                        propertyToRemove: propertyName,
+                        impactedType: impactedType,
+                        toBeReferenced: key,
+                        throughTable: throughTable
+                    });
 
                 }
             });
@@ -647,30 +667,25 @@ function generateModels(modelSchema) {
 
         // IMPACTINC CHANGES DUE TO ARRAYS FOUND
         if (arrays.length > 0) {
-            for (let i = 0; i < modelSchemas.length; i++) {
+            for (let i = 0; i < modelSchemas.length; i++) { // for each model
                 const key = modelSchemas[i].key;
                 const value = modelSchemas[i].modSchema;
-                for (let i = 0; i < arrays.length; i++) {
+                for (let i = 0; i < arrays.length; i++) { // for each referenced impacted type in the array
                     const impactedType = arrays[i].impactedType;
                     const toBeReferenced = arrays[i].toBeReferenced;
-                    if (key === impactedType) {
+                    const throughTable = arrays[i].throughTable;
+                    if (key === impactedType) { // if current model == impactedType in the array
                         // Found model to be impacted by the array
                         if (impactedType !== '') {
                             const tbrSchema = modelSchema[toBeReferenced];
-                            const pkForTypeToFind = findPrimaryKey(tbrSchema);
-                            // value['id_' + uncapitalize(toBeReferenced)] = {
-                            //     type: tbrSchema.properties[pkForTypeToFind.fkName].type,
-                            //     references: {
-                            //         model: toBeReferenced,
-                            //         key: pkForTypeToFind.fkName
-                            //     }
-                            // }
+                            const pkForTypeToFind = findPrimaryKey(toBeReferenced, tbrSchema);
 
                             associations[key] = associations[key] || [];
                             associations[key].push({
                                 referencedModel: toBeReferenced,
-                                fkUsed: pkForTypeToFind.fkName,
-                                nullable: false
+                                fkUsed: pkForTypeToFind.pks,
+                                throughTable: throughTable,
+                                nullable: true
                             });
 
                         }
@@ -719,26 +734,48 @@ function generateModels(modelSchema) {
                         for (let i = 0; i< associationValue.length; i++){
                             console.log('key = ', associationKey);
                             console.log('value = ', associationValue[i]);
+                            console.log('throughTable = ', associationValue[i].throughTable);
                             const referencedModel = associationValue[i].referencedModel;
+                            const throughTable = associationValue[i].throughTable;
 
                             // PART 1 => ASSOCIATE IN MODEL REFERENCING
-                            modelContents[currentKey].modelContent += '\n';
-                            modelContents[currentKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
-                            modelContents[currentKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
-                            modelContents[currentKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
-                            modelContents[currentKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '\'\n';
-                            // modelContents[currentKey].modelContent += '\t\t\tforeignKey: {\n';
-                            // modelContents[currentKey].modelContent += '\t\t\t\tname: id_'+ uncapitalize(referencedModel) +',\n';
-                            // modelContents[currentKey].modelContent += '\t\t\t\tallowNull: '+ associationValue[i].nullable +',\n';
-                            // modelContents[currentKey].modelContent += '\t\t\t}\n';
-                            modelContents[currentKey].modelContent += '\t\t});\n';
-                            modelContents[currentKey].modelContent += '\t};\n';
+                            if (throughTable){
+                                modelContents[currentKey].modelContent += '\n';
+                                modelContents[currentKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                modelContents[currentKey].modelContent += '\t\tmodels.' + associationKey +
+                                    '.belongsToMany(models.'+ referencedModel +', {as: \'' + uncapitalize(referencedModel) + 's' +
+                                    '\', through: \'' + throughTable +
+                                    '\', foreignKey: \'id_' + uncapitalize(associationKey) +
+                                    '\', otherKey: \'id_' + uncapitalize(referencedModel) + '\'});\n';
+                                modelContents[currentKey].modelContent += '\t};\n';
+
+                            }else {
+                                modelContents[currentKey].modelContent += '\n';
+                                modelContents[currentKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                modelContents[currentKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
+                                modelContents[currentKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
+                                modelContents[currentKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '\'\n';
+                                modelContents[currentKey].modelContent += '\t\t});\n';
+                                modelContents[currentKey].modelContent += '\t};\n';
+                            }
+
 
                             // PART 2 => ASSOCIATE IN MODEL REFERENCED
-                            modelContents[referencedModel].modelContent += '\n';
-                            modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
-                            modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
-                            modelContents[referencedModel].modelContent += '\t};\n';
+                            if (throughTable){
+                                modelContents[referencedModel].modelContent += '\n';
+                                modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel +
+                                    '.belongsToMany(models.'+ associationKey +', {as: \'' + uncapitalize(associationKey) + 's' +
+                                    '\', through: \'' + throughTable +
+                                    '\', foreignKey: \'id_' + uncapitalize(referencedModel) +
+                                    '\', otherKey: \'id_' + uncapitalize(associationKey) + '\'});\n';
+                                modelContents[referencedModel].modelContent += '\t};\n';
+                            } else {
+                                modelContents[referencedModel].modelContent += '\n';
+                                modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
+                                modelContents[referencedModel].modelContent += '\t};\n';
+                            }
                         }
                     }
                 }

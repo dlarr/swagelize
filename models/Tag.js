@@ -11,10 +11,7 @@ module.exports = function(sequelize, DataTypes) {
 	});
 
 	 Tag.associate =  function (models) {
-		models.Tag.belongsTo(models.Pet, {
-			onDelete:'CASCADE',
-			foreignKey: 'id_pet'
-		});
+		models.Tag.belongsToMany(models.Pet, {as: 'pets', through: 'PetTag', foreignKey: 'id_tag', otherKey: 'id_pet'});
 	};
 
 	return Tag;

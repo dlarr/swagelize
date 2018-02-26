@@ -863,8 +863,7 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64",
-          "x-primary-key": true
+          "format": "int64"
         },
         "petId": {
           "type": "integer",
@@ -892,6 +891,7 @@
           "default": false
         }
       },
+      "x-primary-key": ["id"],
       "xml": {
         "name": "Order"
       }
@@ -901,8 +901,7 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64",
-          "x-primary-key": true
+          "format": "int64"
         },
         "username": {
           "type": "string"
@@ -928,6 +927,7 @@
           "description": "User Status"
         }
       },
+      "x-primary-key": ["id"],
       "xml": {
         "name": "User"
       }
@@ -937,13 +937,13 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64",
-          "x-primary-key": true
+          "format": "int64"
         },
         "name": {
           "type": "string"
         }
       },
+      "x-primary-key": ["id"],
       "xml": {
         "name": "Category"
       }
@@ -953,13 +953,13 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64",
-          "x-primary-key": true
+          "format": "int64"
         },
         "name": {
           "type": "string"
         }
       },
+      "x-primary-key": ["id"],
       "xml": {
         "name": "Tag"
       }
@@ -973,11 +973,11 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64",
-          "x-primary-key": true
+          "format": "int64"
         },
         "category": {
-          "$ref": "#/definitions/Category"
+          "$ref": "#/definitions/Category",
+          "nullable": true
         },
         "name": {
           "type": "string",
@@ -1001,7 +1001,8 @@
           },
           "items": {
             "$ref": "#/definitions/Tag"
-          }
+          },
+          "throughTable": "PetTag"
         },
         "status": {
           "type": "string",
@@ -1013,6 +1014,7 @@
           ]
         }
       },
+      "x-primary-key": ["id"],
       "xml": {
         "name": "Pet"
       }
@@ -1022,14 +1024,30 @@
       "properties": {
         "code": {
           "type": "integer",
-          "format": "int32",
-          "x-primary-key": true
+          "format": "int32"
         },
         "type": {
           "type": "string"
         },
         "message": {
           "type": "string"
+        }
+      },
+      "x-primary-key": ["code"]
+    },
+    "PetTag": {
+      "type": "object",
+      "throughTable": true,
+      "properties": {
+        "pet": {
+          "$ref": "#/definitions/Pet"
+        },
+        "tag": {
+          "$ref": "#/definitions/Tag"
+        },
+        "dateX": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }

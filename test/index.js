@@ -52,6 +52,6 @@ exports.testGenerateModels = (test) => {
 
 };
 
-// exports.sequelizeSync = (test) => {
-//     var db = require('../models/index.js');
-// };
+exports.sequelizeSync = (test) => {
+    var db = require('../models/index.js');
+};

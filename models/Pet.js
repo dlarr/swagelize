@@ -18,7 +18,7 @@ module.exports = function(sequelize, DataTypes) {
 	});
 
 	 Pet.associate =  function (models) {
-		models.Pet.hasMany(models.Tag, {foreignKey: 'id_pet'});
+		models.Pet.belongsToMany(models.Tag, {as: 'tags', through: 'PetTag', foreignKey: 'id_pet', otherKey: 'id_tag'});
 	};
 
 	 Pet.associate =  function (models) {
