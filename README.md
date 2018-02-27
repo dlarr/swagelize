@@ -9,10 +9,11 @@ Tasks the lib does:
     - Generate a folder models with index.js containing Sequelize configuration and initialisation
     - Generate all models from swagger definitions node
     - Generate associations within sequelize model files
-        - As of today, only One to Many associations are covered due to lack of swagger spec support of data models feature (no primary key definitions, no cardinality definitions),
-        - many to many associations
-        - One to one associations,
-- (YET TO COME) Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code
+        - One to Many associations,
+        - Many to many associations,
+        - One to one associations.
+- Generate a dao folder with all methods described in swagger path node including parameters and sequelize glu code initialization
+    - Note that sometimes, due to lack of precision in paths node, swagelize can't dtermine sequelize method or model, so you will have to determine what to write here yourself, according to project needs
 
 Restrictions : this libray has been developed for MariaDB project needs, so I only tested it for MariaDB sequelization in a nodejs project
 
@@ -86,7 +87,7 @@ here is a [Pet]N-----1..0[Category] association ( nullable: false would make it 
 ```
 Note the "sourceCardinality" : "N" attribute, allowing to specify the N part ine the relationship.<br/>
 if you decide to put "sourceCardinality" : "1", then you're describing a [Pet]1-----1[Category]. <br/>
-** !!!! Only 1 and N are supported here !!!! **
+**For sourceCardinality value, Only 1 and N are supported here**
 
 
 Here is a [Pet]N-----N[Category] association:

@@ -385,16 +385,6 @@ function generate (schema) {
 
 function findPrimaryKey(theModel, theModelSchema){
     const parsed = JSON.parse(JSON.stringify(theModelSchema));
-    // console.dir(parsed, false, 5, true);
-    // let fkPropertySchema = '';
-    // let fkName = '';
-    // Object.keys(parsed).forEach((propertyName) => {
-    //     var propertySchema = parsed[propertyName];
-    //     if(propertySchema['x-primary-key'] === true) {
-    //         fkPropertySchema = propertyName;
-    //         fkName = propertyName;
-    //     }
-    // });
     if (!parsed['x-primary-key']){
         throw new Error('No primary key referenced for model ' + theModel + ' !!!');
     }
@@ -589,6 +579,9 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
 function uncapitalize(text){
     return text.charAt(0).toLowerCase() + text.substr(1);
 }
+function capitalize(text){
+    return text.charAt(0).toUpperCase() + text.substr(1);
+}
 
 /**
  * Generate all sequelize models based on completeSwaggerSchema.definitions input
@@ -720,13 +713,13 @@ function generateModels(modelSchema) {
         for(let i = 0; i < modelSchemas.length; i++) {
             const currentKey = modelSchemas[i].key;
             if (associations[currentKey]){
-                console.log('Process associations for ', currentKey);
+                // console.log('Process associations for ', currentKey);
                 for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
                     if (currentKey === associationKey){
                         for (let i = 0; i< associationValue.length; i++){
-                            console.log('key = ', associationKey);
-                            console.log('value = ', associationValue[i]);
-                            console.log('throughTable = ', associationValue[i].throughTable);
+                            // console.log('key = ', associationKey);
+                            // console.log('value = ', associationValue[i]);
+                            // console.log('throughTable = ', associationValue[i].throughTable);
                             const referencedModel = associationValue[i].referencedModel;
                             const throughTable = associationValue[i].throughTable;
                             const sourceCardinality = associationValue[i].sourceCardinality;
@@ -804,12 +797,203 @@ function generateModels(modelSchema) {
     });
 }
 
+function getModelToUseForOperation(modelSchemas, dao, httpMethod, params, httpMethodContent, path) {
+    let modelToUseForOperation = '';
+    if (modelSchemas[dao]) {
+        modelToUseForOperation = dao;
+    } else {
+        if (httpMethod === 'post' || httpMethod === 'put') {
+            // Find parameter type to find which Models will be used for sequelize in the DAO
+            for (const [paramIndex, [paramName, paramValue]] of Object.entries(Object.entries(params))) {
+                if (paramValue.schema) {
+                    if (paramValue.schema.$ref) {
+                        const temp = paramValue.schema.split('/');
+                        modelToUseForOperation = temp[temp.length - 1];
+                    } else if (paramValue.schema.items) {
+                        if (paramValue.schema.items.$ref) {
+                            const temp = paramValue.schema.items.$ref.split('/');
+                            modelToUseForOperation = temp[temp.length - 1];
+                        } else {
+                            console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                            modelToUseForOperation = '<<INSERT MODEL>>';
+                        }
+                    } else {
+                        console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                        modelToUseForOperation = '<<INSERT MODEL>>';
+                    }
+                } else {
+                    modelToUseForOperation = '<<INSERT MODEL>>';
+                }
+            }
+
+        } else if (httpMethod === 'get') {
+            // Find type in response node
+            if (httpMethodContent.responses['200'].schema) {
+                if (httpMethodContent.responses['200'].schema.$ref) {
+                    const temp = httpMethodContent.responses['200'].schema.$ref.split('/');
+                    modelToUseForOperation = temp[temp.length - 1];
+                } else if (httpMethodContent.responses['200'].schema.items) {
+                    if (httpMethodContent.responses['200'].schema.items.$ref) {
+                        const temp = httpMethodContent.responses['200'].schema.items.$ref.split('/');
+                        modelToUseForOperation = temp[temp.length - 1];
+                    } else {
+                        // Method returns something that is not an object
+                        console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                        modelToUseForOperation = '<<INSERT MODEL>>';
+                    }
+                } else {
+                    console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                    modelToUseForOperation = '<<INSERT MODEL>>';
+                }
+            }
+        } else if (httpMethod === 'delete') {
+            for (const [paramIndex, [paramName, paramValue]] of Object.entries(Object.entries(params))) {
+                if (paramValue.schema) {
+                    if (paramValue.schema.$ref) {
+                        const temp = paramValue.schema.split('/');
+                        modelToUseForOperation = temp[temp.length - 1];
+                    } else if (paramValue.schema.items) {
+                        if (paramValue.schema.items.$ref) {
+                            const temp = paramValue.schema.items.$ref.split('/');
+                            modelToUseForOperation = temp[temp.length - 1];
+                        } else {
+                            console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                            modelToUseForOperation = '<<INSERT MODEL>>';
+                        }
+                    } else {
+                        console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                        modelToUseForOperation = '<<INSERT MODEL>>';
+                    }
+                } else {
+                    modelToUseForOperation = '<<INSERT MODEL>>';
+                }
+            }
+        }
+    }
+    return modelToUseForOperation;
+}
+
+function getSequelizeMethod(httpMethod, httpMethodContent, dao, path) {
+    console.log('PROCESSING : ' + path + ' method : ' + httpMethod);
+    console.log('httpMethodContent : ', httpMethodContent);
+    let sequelizeMethod = '';
+    switch (httpMethod) {
+        case 'post': {
+            sequelizeMethod = 'create';
+        }
+        break;
+        case 'put': {
+            sequelizeMethod = 'update';
+
+        }
+        break;
+        case 'get': {
+            // can be find or findAll, if response = array then findAll, else find
+            if (httpMethodContent.responses['200'].schema) {
+                if (httpMethodContent.responses['200'].schema.$ref) {
+                    sequelizeMethod = 'find'
+                } else if (httpMethodContent.responses['200'].schema.items) {
+                    sequelizeMethod = 'findAll'
+                } else {
+                    console.log('In ' + dao + ' with path ' + path + ' : ' + httpMethodContent.operationId + ' must return an object...');
+                    sequelizeMethod = '<<INSERT METHOD>>';
+                }
+            }
+        }
+        break;
+        case 'delete': {
+            sequelizeMethod = 'destroy';
+        }
+        break;
+        default: {
+            throw new Error('http method must be post, put, get or delete. Encountered ' + httpMethod + ' in ' + dao + ' for path : ' + path);
+        }
+    }
+    return sequelizeMethod;
+}
+
 /**
  * Generate DAO layer from path & models
  * @param pathSchema
  */
-function generateDaos(pathSchema) {
-	console.log('TODO > generateDaos');
+function generateDaos(completeSwaggerSchema) {
+    const modelSchema = completeSwaggerSchema.definitions;
+    const modelSchemas = {};
+    for (const [index, [key, value]] of Object.entries(Object.entries(modelSchema))) {
+        var result = JSON.parse(JSON.stringify(value.properties));
+        modelSchemas[key] = result;
+    }
+
+	const pathsSchema = completeSwaggerSchema.paths;
+
+    const daos = {}
+    for (const [pathIndex, [path, pathContent]] of Object.entries(Object.entries(pathsSchema))) { // For each path in paths
+        // let daoStringContent = '';
+        console.log('Path found : ' + path);
+        const split = path.split('/');
+        const dao = capitalize(split[1]);
+        console.log('Dao concerned => ', dao);
+
+        daos[dao] = daos[dao] || {key:dao, content: 'const models = require(\'../models\');'};
+
+        // daos[dao].content += 'const models = require(\'../models\');';
+
+        for (const [index, [httpMethod, httpMethodContent]] of Object.entries(Object.entries(pathContent))) {
+            // console.log('\thttpMethod : ' , httpMethod);
+            // console.log('\toperationId : ' , httpMethodContent.operationId);
+
+
+            // Flag and keep parameters for operation : httpMethodContent.operationId
+            let params = {};
+            for (let i = 0; i < httpMethodContent.parameters.length; i++){
+                params[httpMethodContent.parameters[i].name] = {paramName: httpMethodContent.parameters[i].name, paramDef:  httpMethodContent.parameters[i]};
+            }
+
+            // Build parameter string for operationId method signature
+            let operationSignature = '';
+            for (const [paramIndex, [paramName, paramValue]] of Object.entries(Object.entries(params))) {
+                operationSignature += paramName +', ';
+            }
+            operationSignature = operationSignature.substring(0, operationSignature.length - 2);
+            daos[dao].content += 'exports.' + httpMethodContent.operationId + ' = function(' + operationSignature + ') {\n'
+
+
+            // Find Model for sequelize method to use
+            const modelToUseForOperation = getModelToUseForOperation(modelSchemas, dao, httpMethod, params, httpMethodContent, path);
+
+            const sequelizeMethod = getSequelizeMethod(httpMethod, httpMethodContent, dao, path);
+
+            daos[dao].content += '\treturn models.' + modelToUseForOperation + '.' + sequelizeMethod + '({\n';
+            if (sequelizeMethod === 'find' || sequelizeMethod === 'findAll'){
+                daos[dao].content += '\t\tinclude: [\n';
+                daos[dao].content += '\t\t\t//{\n';
+                daos[dao].content += '\t\t\t\t//model: models.<<MODEL TO BE INCLUDED>>,\n';
+                daos[dao].content += '\t\t\t\t//attributes: {exclude: [<<ATTRIBUTES TO BE EXCLUDED>>]}\n';
+                daos[dao].content += '\t\t\t//}\n';
+                daos[dao].content += '\t\t],\n';
+                daos[dao].content += '\t\twhere: {\n';
+                daos[dao].content += '\t\t\t//<<ATTRIBUTE>>: <<PARAM>>,\n';
+                daos[dao].content += '\t\t\t//<<ANOTHER_ATTRIBUTE>>: <<ANOTHER_PARAM>>\n';
+                daos[dao].content += '\t\t}\n';
+                daos[dao].content += '\t});\n';
+                daos[dao].content += '}\n\n';
+            } else {
+                daos[dao].content += '\t\t//attribute1: valueAttribute1,\n';
+                daos[dao].content += '\t\t//attribute2: valueAttribute2,\n';
+                daos[dao].content += '\t});\n';
+                daos[dao].content += '}\n\n';
+            }
+            // daos[dao].content = removeEscaped(daos[dao].content); // NEEDED ????
+
+        }
+
+
+    }
+
+    for (const [index, [key, value]] of Object.entries(Object.entries(daos))) {
+        generateFileSync('./dao', key + 'Dao' + '.js',  value.content);
+    }
+
 }
 
 
@@ -822,7 +1006,7 @@ function generateAll(completeSwaggerSchema) {
     generateFolders();
     generateModelIndex();
     generateModels(completeSwaggerSchema.definitions);
-    generateDaos(completeSwaggerSchema.path);
+    generateDaos(completeSwaggerSchema);
 }
 
 module.exports = {
