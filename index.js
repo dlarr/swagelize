@@ -402,7 +402,8 @@ function removeEscaped(generated){
     return util.inspect(generated,false, 5, false)
         .replace(/'##/g, '')
         .replace(/##'/g, '')
-        .replace(/\\'/g, "'");
+        .replace(/\\'/g, "'")
+        .replace(/\\\\'/g, "\\'");
 }
 
 /**
@@ -695,8 +696,10 @@ function generateModels(modelSchema) {
             sequelizeModelContent += '\tvar ' + key +' = sequelize.define(\'' + key + '\', ';
 
             const generated = generateOne(key, value, modelSchema, associations);
+            console.log('generated =>', generated);
 
             sequelizeModelContent += removeEscaped(generated);
+            console.log('sequelizeModelContent =>', sequelizeModelContent);
 
             sequelizeModelContent += ', {';
             sequelizeModelContent += '\n\t\ttableName: \'' + key + '\',';
