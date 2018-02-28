@@ -13,7 +13,7 @@ var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 
 var sequelize = new Sequelize(process.env.DATABASE_URI);
-var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/swagger2.json', 'utf-8'));
+var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/adresse-swager-v1.json', 'utf-8'));
 
 // exports.testGenerate = (test) => {
 // 	let models = {};
@@ -52,9 +52,15 @@ var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/swagger2.jso
 //
 // };
 
-exports.testGenerateDaos = (test) => {
+// exports.testGenerateDaos = (test) => {
+//     swagelize.setDialect('mariadb');
+//     swagelize.generateDaos(swaggerSpec)
+//     test.done();
+// };
+
+exports.testGenerateAll = (test) => {
     swagelize.setDialect('mariadb');
-    swagelize.generateDaos(swaggerSpec)
+    swagelize.generateAll(swaggerSpec);
     test.done();
 };
 

@@ -934,7 +934,7 @@ function generateDaos(completeSwaggerSchema) {
         const dao = capitalize(split[1]);
         console.log('Dao concerned => ', dao);
 
-        daos[dao] = daos[dao] || {key:dao, content: 'const models = require(\'../models\');'};
+        daos[dao] = daos[dao] || {key:dao, content: 'const models = require(\'../models\');\n\n'};
 
         // daos[dao].content += 'const models = require(\'../models\');';
 
@@ -945,14 +945,17 @@ function generateDaos(completeSwaggerSchema) {
 
             // Flag and keep parameters for operation : httpMethodContent.operationId
             let params = {};
-            for (let i = 0; i < httpMethodContent.parameters.length; i++){
-                params[httpMethodContent.parameters[i].name] = {paramName: httpMethodContent.parameters[i].name, paramDef:  httpMethodContent.parameters[i]};
+            for (let i = 0; i < httpMethodContent.parameters.length; i++) {
+                params[httpMethodContent.parameters[i].name] = {
+                    paramName: httpMethodContent.parameters[i].name,
+                    paramDef: httpMethodContent.parameters[i]
+                };
             }
 
             // Build parameter string for operationId method signature
             let operationSignature = '';
             for (const [paramIndex, [paramName, paramValue]] of Object.entries(Object.entries(params))) {
-                operationSignature += paramName +', ';
+                operationSignature += paramName + ', ';
             }
             operationSignature = operationSignature.substring(0, operationSignature.length - 2);
             daos[dao].content += 'exports.' + httpMethodContent.operationId + ' = function(' + operationSignature + ') {\n'
@@ -964,7 +967,7 @@ function generateDaos(completeSwaggerSchema) {
             const sequelizeMethod = getSequelizeMethod(httpMethod, httpMethodContent, dao, path);
 
             daos[dao].content += '\treturn models.' + modelToUseForOperation + '.' + sequelizeMethod + '({\n';
-            if (sequelizeMethod === 'find' || sequelizeMethod === 'findAll'){
+            if (sequelizeMethod === 'find' || sequelizeMethod === 'findAll') {
                 daos[dao].content += '\t\tinclude: [\n';
                 daos[dao].content += '\t\t\t//{\n';
                 daos[dao].content += '\t\t\t\t//model: models.<<MODEL TO BE INCLUDED>>,\n';
@@ -976,12 +979,28 @@ function generateDaos(completeSwaggerSchema) {
                 daos[dao].content += '\t\t\t//<<ANOTHER_ATTRIBUTE>>: <<ANOTHER_PARAM>>\n';
                 daos[dao].content += '\t\t}\n';
                 daos[dao].content += '\t});\n';
-                daos[dao].content += '}\n\n';
-            } else {
+                daos[dao].content += '};\n\n';
+            } else if (sequelizeMethod === 'destroy') {
+                daos[dao].content += '\t\twhere: {\n';
+                daos[dao].content += '\t\t\t//id: valueId,\n';
+                daos[dao].content += '\t\t}\n';
+                daos[dao].content += '\t});\n';
+                daos[dao].content += '};\n\n';
+            } else if (sequelizeMethod === 'update') {
+                daos[dao].content += '\t\t\t//attribute1: valueAttribute1,\n';
+                daos[dao].content += '\t\t\t//attribute2: valueAttribute2,\n';
+                daos[dao].content += '\t\t},\n';
+                daos[dao].content += '\t\t{\n';
+                daos[dao].content += '\t\t\twhere: {\n';
+                daos[dao].content += '\t\t\t\t//id: idValue\n';
+                daos[dao].content += '\t\t\t}\n';
+                daos[dao].content += '\t\t});\n';
+                daos[dao].content += '};\n\n';
+            } else if (sequelizeMethod === 'create') {
                 daos[dao].content += '\t\t//attribute1: valueAttribute1,\n';
                 daos[dao].content += '\t\t//attribute2: valueAttribute2,\n';
                 daos[dao].content += '\t});\n';
-                daos[dao].content += '}\n\n';
+                daos[dao].content += '};\n\n';
             }
             // daos[dao].content = removeEscaped(daos[dao].content); // NEEDED ????
 
