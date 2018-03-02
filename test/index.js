@@ -58,12 +58,16 @@ var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/local-organi
 //     test.done();
 // };
 
-exports.testGenerateAll = (test) => {
-    swagelize.setDialect('mariadb');
-    swagelize.generateAll(swaggerSpec);
-    test.done();
-};
-
-// exports.sequelizeSync = (test) => {
-//     var db = require('../models/index.js');
+// exports.testGenerateAll = (test) => {
+//     swagelize.setDialect('mariadb');
+//     swagelize.generateAll(swaggerSpec);
+//     test.done();
 // };
+
+exports.sequelizeSync = (test) => {
+    var db = require('../models/index.js');
+    db.sequelize.sync({force:true}).then(()=> {
+        console.log('SYNC DONE...');
+        test.done();
+    })
+};
