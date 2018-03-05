@@ -1,13 +1,13 @@
 {
   "name": "swagelize",
-  "version": "1.0.2",
-  "description": "Generate Sequelize model definitions from a Swagger 2.0 schema",
+  "version": "1.0.3",
+  "description": "Generate Sequelize model definitions and DAO from a Swagger 2.0 schema",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/nodeunit"
   },
-  "author": "Kingsquare BV - Tim de Koning",
-  "repository": "https://github.com/kingsquare/swagger-sequelize",
+  "author": "Denis LARRIEU - Yoop digital",
+  "repository": "https://github.com/dlarr/swagelize",
   "license": "MIT",
   "dependencies": {
     "mysql2": "^1.5.2",
