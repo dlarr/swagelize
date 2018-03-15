@@ -1,10 +1,11 @@
 {
   "name": "swagelize",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "Generate Sequelize model definitions and DAO from a Swagger 2.0 schema",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/nodeunit"
+    "test": "./node_modules/.bin/nodeunit",
+    "publier":"npm publish"
   },
   "author": "Denis LARRIEU - Yoop digital",
   "repository": "https://github.com/dlarr/swagelize",

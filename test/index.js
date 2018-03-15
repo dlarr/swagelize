@@ -41,16 +41,16 @@ var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/local-organi
 //     test.done();
 // };
 
-// exports.testGenerateModels = (test) => {
-//     swagelize.setDialect('mariadb');
-//     swagelize.generateFolders().then(()=>{
-//         swagelize.generateModelIndex();
-//         swagelize.generateModels(swaggerSpec.definitions).then(() => {
-//             test.done();
-//         });
-//     });
-//
-// };
+exports.testGenerateModels = (test) => {
+    swagelize.setDialect('mariadb');
+    swagelize.generateFolders().then(()=>{
+        swagelize.generateModelIndex();
+        swagelize.generateModels(swaggerSpec.definitions).then(() => {
+            test.done();
+        });
+    });
+
+};
 
 // exports.testGenerateDaos = (test) => {
 //     swagelize.setDialect('mariadb');
@@ -66,7 +66,7 @@ var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/local-organi
 
 exports.sequelizeSync = (test) => {
     var db = require('../models/index.js');
-    db.sequelize.sync({force:true}).then(()=> {
+    db.sequelize.sync({alter:true}).then(()=> {
         console.log('SYNC DONE...');
         test.done();
     })

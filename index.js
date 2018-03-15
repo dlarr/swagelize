@@ -426,12 +426,12 @@ function generateModelIndex() {
     sequelizeModelContent += '} else {\n';
     sequelizeModelContent += '\tsequelize = new Sequelize(config.database, config.username, config.password, {\n';
     sequelizeModelContent += '\t\thost: config.host,\n';
-    sequelizeModelContent += '\t\tport: 3306,\n';
-    sequelizeModelContent += '\t\tlogging: true,\n';
+    sequelizeModelContent += '\t\tport: config.dbPort,\n';
+    sequelizeModelContent += '\t\tlogging: config.logging,\n';
     sequelizeModelContent += '\t\tdialect: config.dialect,\n';
     sequelizeModelContent += '\t\tpool: {\n';
-    sequelizeModelContent += '\t\t\tmaxConnections: 5,\n';
-    sequelizeModelContent += '\t\t\tmaxIdleTime: 30\n';
+    sequelizeModelContent += '\t\t\tmaxConnections: config.maxConnections,\n';
+    sequelizeModelContent += '\t\t\tmaxIdleTime: config.maxIdleTime\n';
     sequelizeModelContent += '\t\t}\n';
     sequelizeModelContent += '\t});\n';
     sequelizeModelContent += '\n';
@@ -508,7 +508,7 @@ function generateOne (currentModel, currentModelSchema, allModelsSchema, associa
                 if (propertyName ===  pkeys[i]) {
                     propertySchema.primaryKey = true;
                     propertySchema.allowNull = false;
-                    if (propertySchema['type'] !== 'string'){
+                    if (propertySchema['type'] !== 'string' && pkeys.length == 1){
                         propertySchema.autoIncrement = true;
                     }
                 }
