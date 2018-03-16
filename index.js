@@ -1076,7 +1076,11 @@ function generateDaos(completeSwaggerSchema) {
         const dao = capitalize(split[1]);
         console.log('Dao concerned => ', dao);
 
-        daos[dao] = daos[dao] || {key:dao, content: 'const models = require(\'../models\');\n\n'};
+        let initContent = 'const models = require(\'../models\');\n';
+        initContent += 'const Op = models.Sequelize.Op;\n\n';
+        // initContent += 'const moment = require(\'moment\');\n\n';
+
+        daos[dao] = daos[dao] || {key:dao, content: initContent};
 
         // daos[dao].content += 'const models = require(\'../models\');';
 
