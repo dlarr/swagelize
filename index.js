@@ -728,6 +728,7 @@ function generateModels(modelSchema) {
             const currentKey = modelSchemas[i].key;
             if (associations[currentKey]){
                 console.log('Managing associations for ' + currentKey);
+                modelContents[currentKey].modelContent += '\t ' + currentKey + '.associate =  function (models) {\n';
                 for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
                     if (currentKey === associationKey){
                         for (let i = 0; i< associationValue.length; i++){
@@ -766,79 +767,79 @@ function generateModels(modelSchema) {
                             if (sourceCardinality === 'N' && targetCardinality === 'N') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey +
                                         '.belongsToMany(models.'+ referencedModel +', {as: \'' + uncapitalize(referencedModel) + 's' + 'Source\',' +
                                         'through :' + throughTableStringValue +
                                         'foreignKey: \'id_' + uncapitalize(associationKey) + 'Source\',' +
                                         'otherKey: \'id_' + uncapitalize(referencedModel) + 'Target\'});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+
                                 } else {
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey +
                                         '.belongsToMany(models.'+ referencedModel +', {as: \'' + sourceAttributeName + '\',' +
                                         'through : ' + throughTableStringValue +
                                         'foreignKey: \'id_' + uncapitalize(associationKey) + '\',' +
                                         'otherKey: \'id_' + uncapitalize(referencedModel) + '\'});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === 'N' && targetCardinality === '1') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '_parent\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 } else {
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === '1' && targetCardinality === 'N') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '_parent\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 } else {
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === '1' && targetCardinality === '1') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + uncapitalize(referencedModel) + '_parent\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 } else {
                                     modelContents[associationKey].modelContent += '\n';
-                                    modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
+                                    // modelContents[associationKey].modelContent += '\t ' + associationKey + '.associate =  function (models) {\n';
                                     modelContents[associationKey].modelContent += '\t\tmodels.' + associationKey + '.belongsTo(models.'+ referencedModel +', {\n';
                                     modelContents[associationKey].modelContent += '\t\t\tonDelete:\'CASCADE\',\n'; // TODO > define proper onDelete, onUpdate strategy here
                                     modelContents[associationKey].modelContent += '\t\t\tforeignKey: \'id_' + sourceAttributeName + '\'\n';
                                     modelContents[associationKey].modelContent += '\t\t});\n';
-                                    modelContents[associationKey].modelContent += '\t};\n';
+                                    // modelContents[associationKey].modelContent += '\t};\n';
                                 }
 
                             } else {
@@ -851,43 +852,43 @@ function generateModels(modelSchema) {
                             if (sourceCardinality === 'N' && targetCardinality === 'N') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel +
                                         '.belongsToMany(models.'+ associationKey +', {as: \'' + uncapitalize(associationKey) + 's' + 'Target\',' +
                                         'through: ' + throughTableStringValue +
                                         'foreignKey: \'id_' + uncapitalize(referencedModel) + 'Target\',' +
                                         'otherKey: \'id_' + uncapitalize(associationKey) + 'Source\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 } else {
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel +
                                         '.belongsToMany(models.'+ associationKey +', {as: \'' + uncapitalize(associationKey) + 's\',' +
                                         'through: ' + throughTableStringValue +
                                         'foreignKey: \'id_' + uncapitalize(referencedModel) + '\',' +
                                         'otherKey: \'id_' + uncapitalize(associationKey) + '\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === 'N' && targetCardinality === '1') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+
                                         associationKey +', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '_parent\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 } else {
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +
                                         ', {as: \'' + sourceAttributeName + '\', foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === '1' && targetCardinality === 'N') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
                                         ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '_parent\'});\n';
                                     modelContents[referencedModel].modelContent += '\t};\n';
@@ -896,22 +897,22 @@ function generateModels(modelSchema) {
                                     modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
                                         ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
 
                             } else if (sourceCardinality === '1' && targetCardinality === '1') {
                                 if (associationKey === referencedModel) { // Recursive relation
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
                                         ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '_parent\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 } else {
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
                                         ', {foreignKey: \'id_'+ sourceAttributeName + '\'});\n';
-                                    modelContents[referencedModel].modelContent += '\t};\n';
+                                    // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
                             } else {
                                 throw new Error('this error won\'t happen ever, because error already thrown sooner');
@@ -919,6 +920,7 @@ function generateModels(modelSchema) {
                         }
                     }
                 }
+                modelContents[currentKey].modelContent += '\t};\n';
             }
 
         }
