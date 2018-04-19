@@ -897,7 +897,7 @@ function generateModels(modelSchema) {
                                     modelContents[referencedModel].modelContent += '\n';
                                     // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasMany(models.'+ associationKey +
-                                        ', {as: \'' + sourceAttributeName + '\', foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
+                                        ', {as: \'' + sourceAttributeName + '\', foreignKey: \'id_'+ uncapitalize(referencedModel) + '\', onDelete:\'CASCADE\'});\n';
                                     // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
 
@@ -912,7 +912,7 @@ function generateModels(modelSchema) {
                                     modelContents[referencedModel].modelContent += '\n';
                                     modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
-                                        ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\'});\n';
+                                        ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\', onDelete:\'CASCADE\'});\n';
                                     // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
 
@@ -927,7 +927,7 @@ function generateModels(modelSchema) {
                                     modelContents[referencedModel].modelContent += '\n';
                                     // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
-                                        ', {foreignKey: \'id_'+ sourceAttributeName + '\'});\n';
+                                        ', {foreignKey: \'id_'+ sourceAttributeName + '\', onDelete:\'CASCADE\'});\n';
                                     // modelContents[referencedModel].modelContent += '\t};\n';
                                 }
                             } else {
