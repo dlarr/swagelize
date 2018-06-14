@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         grunt.log.writeln('GRUNG TASK LAUNCHED : generateModels');
         console.log('NODE_ENV = ', process.env.NODE_ENV);
         console.log('env = ', env);
-        const swaggerSpec = JSON.parse(fs.readFileSync('./swagger/local-media-swager-v1.json', 'utf-8'));
+        const swaggerSpec = JSON.parse(fs.readFileSync('./swagger/swagger2.json', 'utf-8'));
         swagelize.generateAll(swaggerSpec);
     });
 

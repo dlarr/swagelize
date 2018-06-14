@@ -7,7 +7,7 @@
     "start": "node index.js",
     "test": "test",
     "prebuild": "rimraf build && grunt doCopyBuild",
-    "generate-api": "cd swagger && java -jar swagger-codegen-cli.jar generate -i local-media-swager-v1.json -l nodejs-server -o ../",
+    "generate-api": "cd swagger && java -jar swagger-codegen-cli.jar generate -i swagger2.json -l nodejs-server -o ../",
     "generate-models": "grunt generateModels",
     "generate-db": "grunt generateDB",
     "generate-all": "npm run generate-api && npm run generate-models && npm run generate-db"
