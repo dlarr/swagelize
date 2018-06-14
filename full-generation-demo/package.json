@@ -42,7 +42,6 @@
     "grunt": "^1.0.2",
     "sequelize": "^4.33.4",
     "mysql2": "^1.5.2",
-    "swagelize": "1.1.0",
     "rimraf": "2.6.2"
   }
 }
