@@ -29,6 +29,7 @@ This is a fake project. The objective is to demonstrate the full-generation of a
     * npm install -g rimraf
     * npm install -g grunt
 * Download ZIP from github and extract it somewhere
+* Run this command in project root : npm install
 * Go to folder full-generation-demo
 * Run npm install
 * Generation part
