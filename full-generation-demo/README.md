@@ -19,15 +19,18 @@ This is a fake project. The objective is to demonstrate the full-generation of a
         * Possibly generation of the database tables
 
 # Step by step process of generation
-* First install a database, we'll use MariaDB in this demo
+
+* Install a database, we'll use MariaDB in this demo
     * Set up a DB_USER
     * Set up a DB_PASSWORD
     * Create a schema DB_NAME
     * Update your config.js to fit these values
-* Run npm install
 * Install globally rimraf (delete folders lib) and grunt (task runner lib)
     * npm install -g rimraf
     * npm install -g grunt
+* Download ZIP from github and extract it somewhere
+* Go to folder full-generation-demo
+* Run npm install
 * Generation part
     * 1st part is swagger-codegen generation
         * We will be using the JAR contained in swagger folder
