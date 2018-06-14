@@ -727,10 +727,26 @@ function generateModels(modelSchema) {
 
         console.log('MANANING FIRST LINE OF ASSOCIATION IN EVERY MODELS : Model.associate = function (models)');
         var modelFirstLineDone = {};
+        // for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
+        //     modelContents[associationKey].modelContent += '\n\t ' + associationKey + '.associate =  function (models) {\n';
+        //     modelFirstLineDone[associationKey] = modelFirstLineDone[associationKey] || {};
+        //     modelFirstLineDone[associationKey] = {model: associationKey, done: true};
+        //     for (let i = 0; i < associationValue.length; i++){
+        //         modelFirstLineDone[associationValue[i].referencedModel] = modelFirstLineDone[associationValue[i].referencedModel] || {};
+        //         if (!(modelFirstLineDone[associationValue[i].referencedModel].done)){
+        //             modelContents[associationValue[i].referencedModel].modelContent += '\n\t ' + associationValue[i].referencedModel + '.associate =  function (models) {\n';
+        //             modelFirstLineDone[associationValue[i].referencedModel] = {model: associationValue[i].referencedModel, done: true};
+        //         }
+        //
+        //     }
+        // }
+
         for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
-            modelContents[associationKey].modelContent += '\n\t ' + associationKey + '.associate =  function (models) {\n';
             modelFirstLineDone[associationKey] = modelFirstLineDone[associationKey] || {};
-            modelFirstLineDone[associationKey] = {model: associationKey, done: true};
+            if (!(modelFirstLineDone[associationKey].done)) {
+                modelContents[associationKey].modelContent += '\n\t ' + associationKey + '.associate =  function (models) {\n';
+                modelFirstLineDone[associationKey] = {model: associationKey, done: true};
+            }
             for (let i = 0; i < associationValue.length; i++){
                 modelFirstLineDone[associationValue[i].referencedModel] = modelFirstLineDone[associationValue[i].referencedModel] || {};
                 if (!(modelFirstLineDone[associationValue[i].referencedModel].done)){
@@ -910,7 +926,7 @@ function generateModels(modelSchema) {
                                     modelContents[referencedModel].modelContent += '\t};\n';
                                 } else {
                                     modelContents[referencedModel].modelContent += '\n';
-                                    modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
+                                    // modelContents[referencedModel].modelContent += '\t ' + referencedModel + '.associate =  function (models) {\n';
                                     modelContents[referencedModel].modelContent += '\t\tmodels.' + referencedModel + '.hasOne(models.'+ associationKey +
                                         ', {foreignKey: \'id_'+ uncapitalize(referencedModel) + '\', onDelete:\'CASCADE\'});\n';
                                     // modelContents[referencedModel].modelContent += '\t};\n';
@@ -946,12 +962,28 @@ function generateModels(modelSchema) {
         console.dir(associations, {depth:null, colors:true});
 
         var modelLastLineDone = {};
+        // for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
+        //     modelContents[associationKey].modelContent += '\t};\n';
+        //     modelLastLineDone[associationKey] = modelLastLineDone[associationKey] || {};
+        //     modelLastLineDone[associationKey] = {model: associationKey, done: true};
+        //     for (let i = 0; i < associationValue.length; i++){
+        //         console.log('DEBUG REMOVE THIS associationValue[i].referencedModel = ', associationValue[i].referencedModel);
+        //         modelLastLineDone[associationValue[i].referencedModel] = modelLastLineDone[associationValue[i].referencedModel] || {};
+        //         if (!(modelLastLineDone[associationValue[i].referencedModel].done)){
+        //             modelContents[associationValue[i].referencedModel].modelContent += '\n\t};\n';
+        //             modelLastLineDone[associationValue[i].referencedModel] = {model: associationValue[i].referencedModel, done: true};
+        //         }
+        //
+        //     }
+        // }
+
         for (const [index, [associationKey, associationValue]] of Object.entries(Object.entries(associations))) {
-            modelContents[associationKey].modelContent += '\t};\n';
             modelLastLineDone[associationKey] = modelLastLineDone[associationKey] || {};
-            modelLastLineDone[associationKey] = {model: associationKey, done: true};
+            if (!(modelLastLineDone[associationKey].done)) {
+                modelContents[associationKey].modelContent += '\t};\n';
+                modelLastLineDone[associationKey] = {model: associationKey, done: true};
+            }
             for (let i = 0; i < associationValue.length; i++){
-                console.log('DEBUG REMOVE THIS associationValue[i].referencedModel = ', associationValue[i].referencedModel);
                 modelLastLineDone[associationValue[i].referencedModel] = modelLastLineDone[associationValue[i].referencedModel] || {};
                 if (!(modelLastLineDone[associationValue[i].referencedModel].done)){
                     modelContents[associationValue[i].referencedModel].modelContent += '\n\t};\n';

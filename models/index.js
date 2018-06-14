@@ -14,12 +14,12 @@ if (config.use_env_constiable) {
 } else {
 	sequelize = new Sequelize(config.database, config.username, config.password, {
 		host: config.host,
-		port: 3306,
-		logging: true,
+		port: config.dbPort,
+		logging: config.logging,
 		dialect: config.dialect,
 		pool: {
-			maxConnections: 5,
-			maxIdleTime: 30
+			maxConnections: config.maxConnections,
+			maxIdleTime: config.maxIdleTime
 		}
 	});
 

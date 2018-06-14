@@ -13,7 +13,7 @@ var Sequelize = require('sequelize');
 var Promise = require('bluebird');
 
 var sequelize = new Sequelize(process.env.DATABASE_URI);
-var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/local-media-swager-v1.json', 'utf-8'));
+var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/swagger2.json', 'utf-8'));
 
 // exports.testGenerate = (test) => {
 // 	let models = {};

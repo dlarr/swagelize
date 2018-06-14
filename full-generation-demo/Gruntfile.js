@@ -1,5 +1,5 @@
 const fs = require('fs');
-const swagelize = require('../index');
+const swagelize = require('swagelize');
 const env = process.env.NODE_ENV || 'local';
 
 module.exports = function(grunt) {

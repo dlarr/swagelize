@@ -29,7 +29,6 @@ This is a fake project. The objective is to demonstrate the full-generation of a
     * npm install -g rimraf
     * npm install -g grunt
 * Download ZIP from github and extract it somewhere
-* Run this command in project root : npm install
 * Go to folder full-generation-demo
 * Run npm install
 * Generation part
@@ -40,6 +39,7 @@ This is a fake project. The objective is to demonstrate the full-generation of a
         * run this command : npm run generate-models
     * 3rd part is DB sync with sequelize
         * run this command : npm run generate-db
+        * console must show a SYNC DONE ... message otherwise, something went wrong.
 * By now, generation is completed
 * Run project
     * run this commande : npm run start
