@@ -1,7 +1,7 @@
 module.exports = {
     "secret": "SomeHashedToken",
     "local": {
-        "referentielPort": "6666",
+        "referentielPort": "3025",
         "username": "DB_USER",
         "password": "DB_PASSWORD",
         "database": "DB_NAME",
@@ -13,7 +13,7 @@ module.exports = {
         "dbPort": "3306"
     },
     "developpement": {
-        "referentielPort": "6666",
+        "referentielPort": "3025",
         "username": "DB_USER",
         "password": "DB_PASSWORD",
         "database": "DB_NAME",
@@ -25,7 +25,7 @@ module.exports = {
         "dbPort": "3306"
     },
     "recette": {
-        "referentielPort": "6666",
+        "referentielPort": "3025",
         "username": "DB_USER",
         "password": "DB_PASSWORD",
         "database": "DB_NAME",
@@ -37,7 +37,7 @@ module.exports = {
         "dbPort": "3306"
     },
     "production": {
-        "referentielPort": "6666",
+        "referentielPort": "3025",
         "username": "DB_USER",
         "password": "DB_PASSWORD",
         "database": "DB_NAME",
