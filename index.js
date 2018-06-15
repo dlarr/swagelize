@@ -1182,7 +1182,20 @@ function generateDaos(completeSwaggerSchema) {
 
             const sequelizeMethod = getSequelizeMethod(httpMethod, httpMethodContent, dao, path);
 
-            daos[dao].content += '\treturn models.' + modelToUseForOperation + '.' + sequelizeMethod + '({\n';
+            if (modelToUseForOperation === '<<INSERT MODEL>>'){
+                if (sequelizeMethod === '<<INSERT METHOD>>'){
+                    daos[dao].content += '\treturn models.' + 'XXXX' + '.' + 'find' + '({ // TODO PLEASE SET THE DESIRED MODEL AND METHOD HERE\n';
+                }else {
+                    daos[dao].content += '\treturn models.' + 'XXXX' + '.' + sequelizeMethod + '({ // TODO PLEASE SET THE DESIRED MODEL HERE\n';
+                }
+            }else {
+                if (sequelizeMethod === '<<INSERT METHOD>>'){
+                    daos[dao].content += '\treturn models.' + modelToUseForOperation + '.' + 'find' + '({ // TODO PLEASE SET THE DESIRED METHOD HERE\n';
+                }else {
+                    daos[dao].content += '\treturn models.' + modelToUseForOperation + '.' + sequelizeMethod + '({\n';
+                }
+            }
+
             if (sequelizeMethod === 'find' || sequelizeMethod === 'findAll') {
                 daos[dao].content += '\t\tinclude: [\n';
                 daos[dao].content += '\t\t\t//{\n';
@@ -1215,6 +1228,19 @@ function generateDaos(completeSwaggerSchema) {
             } else if (sequelizeMethod === 'create') {
                 daos[dao].content += '\t\t//attribute1: valueAttribute1,\n';
                 daos[dao].content += '\t\t//attribute2: valueAttribute2,\n';
+                daos[dao].content += '\t});\n';
+                daos[dao].content += '};\n\n';
+            } else if (sequelizeMethod === '<<INSERT METHOD>>'){
+                daos[dao].content += '\t\tinclude: [\n';
+                daos[dao].content += '\t\t\t//{\n';
+                daos[dao].content += '\t\t\t\t//model: models.<<MODEL TO BE INCLUDED>>,\n';
+                daos[dao].content += '\t\t\t\t//attributes: {exclude: [<<ATTRIBUTES TO BE EXCLUDED>>]}\n';
+                daos[dao].content += '\t\t\t//}\n';
+                daos[dao].content += '\t\t],\n';
+                daos[dao].content += '\t\twhere: {\n';
+                daos[dao].content += '\t\t\t//<<ATTRIBUTE>>: <<PARAM>>,\n';
+                daos[dao].content += '\t\t\t//<<ANOTHER_ATTRIBUTE>>: <<ANOTHER_PARAM>>\n';
+                daos[dao].content += '\t\t}\n';
                 daos[dao].content += '\t});\n';
                 daos[dao].content += '};\n\n';
             }

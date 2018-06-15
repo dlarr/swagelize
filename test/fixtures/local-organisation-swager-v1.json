@@ -1,0 +1,430 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Application permettant d'interroger le référentiel organisation.",
+    "version": "1.0.0",
+    "title": "Référentiel Organisation"
+  },
+  "host": "localhost:3002",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "organisation",
+      "description": "Ensemble d'élément autour de l'organisation"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/organisation": {
+      "post": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Ajout d'une nouvelle organisation dans le référentiel",
+        "description": "",
+        "operationId": "addOrganisation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Un Objet de type organisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Organisation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Organisation"
+            }
+          },
+          "405": {
+            "description": "Paramètre d'entrée invalide"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Récupère la liste des organisation du référentiel",
+        "description": "",
+        "operationId": "getAllOrganisation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Organisation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/organisation/{id}": {
+      "get": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Recherche par l'identifiant",
+        "description": "Retourne une organisation",
+        "operationId": "getOrganisationById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "L'identifiant de l'organisation à retourner",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Opération réussie",
+            "schema": {
+              "$ref": "#/definitions/Organisation"
+            }
+          },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Organisation non trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Mise à jour d'une organisation dans le référentiel",
+        "description": "",
+        "operationId": "updateOrganisationWithForm",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identifiant de l'organisation à mettre à jour",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Un Objet de type organisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Organisation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Organisation"
+            }
+          },
+          "405": {
+            "description": "Paramètre d'entrée invalide"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Suppression d'une organisation",
+        "description": "",
+        "operationId": "deleteOrganisation",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identifiant de l'organisation à supprimer",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Adresse non trouvée"
+          }
+        }
+      }
+    },
+    "/organisation/arborescence/{lien}/{id}": {
+      "get": {
+        "tags": [
+          "organisation"
+        ],
+        "summary": "Recherche une structure d'organisations en fonction du type de lien, l'identifiant donné indiquera la structure racine",
+        "description": "Retourne l'arborescence d'une organisation en fonction d'un type de lien",
+        "operationId": "getArborescenceByLienId",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "lien",
+            "in": "path",
+            "description": "Type de lien caractérisant la structure d'organisations à retourner",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "L'identifiant de l'organisation racine de la structure à retourner",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Opération réussie",
+            "schema": {
+              "$ref": "#/definitions/Organisation"
+            }
+          },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Organisation non trouvée"
+          }
+        }
+      }
+    },
+    "/relation": {
+      "post": {
+        "tags": [
+          "relation"
+        ],
+        "summary": "Ajout d'une nouvelle organisation dans le référentiel",
+        "description": "",
+        "operationId": "addRelation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Un Objet de type relation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Relation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Relation"
+            }
+          },
+          "405": {
+            "description": "Paramètre d'entrée invalide"
+          }
+        }
+      }
+    },
+    "/relation/{lien}/{idSource}/{idTarget}": {
+      "get": {
+        "tags": [
+          "relation"
+        ],
+        "summary": "Recherche une relation unique de deux organisations",
+        "description": "Retourne la relation unique",
+        "operationId": "getRelationUnique",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "lien",
+            "in": "path",
+            "description": "Type de lien caractérisant la structure d'organisations à retourner",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "idSource",
+            "in": "path",
+            "description": "L'identifiant de l'organisation source de la relation à retourner",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "idTarget",
+            "in": "path",
+            "description": "L'identifiant de l'organisation cible de la relation à retourner",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Opération réussie",
+            "schema": {
+              "$ref": "#/definitions/Relation"
+            }
+          },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Relation non trouvée"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Organisation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Identifiant unique technique"
+        },
+        "dateDebut": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date début d\\'entrée en service de l\\'organisation"
+        },
+        "dateFin": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date fin de service de l\\'organisation"
+        },
+        "perimTer": {
+          "type": "string",
+          "description": "Périmètre territorial",
+          "enum": [
+            "National",
+            "Regional",
+            "Départemental",
+            "Local"
+          ]
+        },
+        "typeAssoAdmr": {
+          "type": "string",
+          "description": "Correspond à des statuts d\\'association prédéfinis",
+          "enum": [
+            "Asso Locale",
+            "Fédération Départementale",
+            "Comité Régional",
+            "Structure nationale",
+            "Autre Association Admr",
+            "Autre Admr",
+            "Non Admr Niveau Territorial"
+          ]
+        },
+        "nomOrg": {
+          "type": "string",
+          "description": "Nom de l\\'organisation"
+        },
+        "siren": {
+          "type": "integer",
+          "description": "SIREN de l\\'organisation"
+        },
+        "codape": {
+          "type": "integer",
+          "description": "Code APE de l\\'organisation"
+        },
+        "idFoncMedia": {
+          "type": "string",
+          "description": "ID fonctionnel des coordonnées médiatiques de l\\'organisation"
+        },
+        "idFoncAdresse": {
+          "type": "string",
+          "description": "ID fonctionnel de l\\'adresse de l\\'organisation"
+        },
+        "organisations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Organisation"
+          },
+          "throughTable": "Relation",
+          "sourceCardinality": "N"
+        }
+      },
+      "x-primary-key": ["id"]
+    },
+    "Relation": {
+      "type": "object",
+      "throughTable": true,
+      "properties": {
+        "lien": {
+          "type": "string",
+          "nullable": false
+        },
+        "id_organisationSource": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": false
+        },
+        "id_organisationTarget": {
+          "type": "integer",
+          "format": "int64",
+          "nullable": false
+        }
+      },
+      "x-primary-key": ["lien","id_organisationSource","id_organisationTarget"],
+      "uniqueFks": false
+    }
+  }
+}

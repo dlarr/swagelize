@@ -1,0 +1,205 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Application permettant d'interroger le référentiel adresse.",
+    "version": "1.0.0",
+    "title": "Référentiel Adresse"
+  },
+  "host": "referenciel.nsi.fr",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "adresse",
+      "description": "Ensemble d'élément autour de l'adresse"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/adresse": {
+      "post": {
+        "tags": [
+          "adresse"
+        ],
+        "summary": "Ajout d'une nouvelle adresse dans le référentiel",
+        "description": "",
+        "operationId": "addAdresse",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Un Objet de type adresse",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Adresse"
+            }
+          }
+        ],
+        "responses": {
+		  "200": {
+			"description": "successful operation",
+			"schema": {
+			  "type": "object",
+			  "$ref": "#/definitions/Adresse"
+			}
+		  },
+          "405": {
+            "description": "Paramètre d'entrée invalide"
+          }
+        }
+      }
+    },
+    "/adresse/{adresseId}": {
+      "get": {
+        "tags": [
+          "adresse"
+        ],
+        "summary": "Recherche par ID",
+        "description": "Retourne une adresse",
+        "operationId": "getAdresseById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "adresseId",
+            "in": "path",
+            "description": "ID de l'adresse à retourner",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Opération réussie",
+            "schema": {
+              "$ref": "#/definitions/Adresse"
+            }
+          },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Adresse non trouvée"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "adresse"
+        ],
+        "summary": "Mise à jour d'une adresse dans le référentiel",
+        "description": "",
+        "operationId": "updateAdresseWithForm",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "adresseId",
+            "in": "path",
+            "description": "Identifiant de l'adresse à mettre à jour",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+		  
+		  "200": {
+			"description": "successful operation",
+			"schema": {
+			  "type": "object",
+			  "$ref": "#/definitions/Adresse"
+			}
+		  },
+          "405": {
+            "description": "Paramètre d'entrée invalide"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "adresse"
+        ],
+        "summary": "Suppression d'une adresse",
+        "description": "",
+        "operationId": "deleteAdresse",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "adresseId",
+            "in": "path",
+            "description": "Identifiant de l'adresse à supprimer",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+		  "200": {
+			"description": "successful operation",
+			"schema": {
+			  "type": "string"
+			}
+		  },
+          "400": {
+            "description": "Identifiant invalide"
+          },
+          "404": {
+            "description": "Adresse non trouvée"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Adresse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "adresseId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "numero": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "ligneAdresse1": {
+          "type": "string"
+        },
+        "ligneAdresse2": {
+          "type": "string"
+        },
+        "ligneAdresse3": {
+          "type": "string"
+        },
+        "codePostal": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "ville": {
+          "type": "string"
+        }
+      },
+	  "x-primary-key": ["id"]
+    }
+  }
+}

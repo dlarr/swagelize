@@ -41,22 +41,22 @@ var swaggerSpec = JSON.parse(fs.readFileSync(__dirname + '/fixtures/swagger2.jso
 //     test.done();
 // };
 
-exports.testGenerateModels = (test) => {
-    swagelize.setDialect('mariadb');
-    swagelize.generateFolders().then(()=>{
-        swagelize.generateModelIndex();
-        swagelize.generateModels(swaggerSpec.definitions).then(() => {
-            test.done();
-        });
-    });
-
-};
-
-// exports.testGenerateDaos = (test) => {
+// exports.testGenerateModels = (test) => {
 //     swagelize.setDialect('mariadb');
-//     swagelize.generateDaos(swaggerSpec)
-//     test.done();
+//     swagelize.generateFolders().then(()=>{
+//         swagelize.generateModelIndex();
+//         swagelize.generateModels(swaggerSpec.definitions).then(() => {
+//             test.done();
+//         });
+//     });
+//
 // };
+
+exports.testGenerateDaos = (test) => {
+    swagelize.setDialect('mariadb');
+    swagelize.generateDaos(swaggerSpec)
+    test.done();
+};
 
 // exports.testGenerateAll = (test) => {
 //     swagelize.setDialect('mariadb');
