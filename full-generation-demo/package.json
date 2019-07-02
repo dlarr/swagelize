@@ -35,12 +35,12 @@
     "moment": "^2.22.0",
     "moment-timezone": "^0.5.14",
     "mysql2": "^1.5.2",
-    "sequelize": "^4.33.4",
+    "sequelize": "5.9.1",
     "swagger-tools": "0.10.1"
   },
   "devDependencies": {
     "grunt": "^1.0.2",
-    "sequelize": "^4.33.4",
+    "sequelize": "5.9.1",
     "mysql2": "^1.5.2",
     "swagelize": "^1.5.0",
     "rimraf": "2.6.2"
